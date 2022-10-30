@@ -5,33 +5,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/SergioVenicio/neo4jMusic/entities"
 	"github.com/joho/godotenv"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
-type Instrument struct {
-	Name string
-}
-
-type Musician struct {
-	Name       string
-	Instrument *Instrument
-}
-
-type Band struct {
-	Name     string
-	Musician *Musician
-}
-
-type Album struct {
-	Name string
-}
-
-type Music struct {
-	Name string
-}
-
-func main() {
+func mainOld() {
 	godotenv.Load()
 
 	dbUri := os.Getenv("NEO4J_HOST")
@@ -70,23 +49,23 @@ func main() {
 	}
 }
 
-func FindBands(driver neo4j.DriverWithContext, ctx context.Context) ([]*Band, error) {
+func FindBands(driver neo4j.DriverWithContext, ctx context.Context) ([]*entities.Band, error) {
 	session := driver.NewSession(ctx, neo4j.SessionConfig{AccessMode: neo4j.AccessModeRead})
 	defer session.Close(ctx)
 	bands, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (interface{}, error) {
-		var bands []*Band
-		result, err := tx.Run(ctx, "MATCH(b:Band)<-[:Belongs]-(m:Musician)-[:Play]-(i:Instrument) RETURN b.name, m.name, i.name ORDER BY b.name, m.name", nil)
+		var bands []*entities.Band
+		result, err := tx.Run(ctx, "MATCH(b:Band)<-[:BELONGS]-(m:Musician)-[:PLAYS]-(i:Instrument) RETURN b.name, m.name, i.name ORDER BY b.name, m.name", nil)
 		if err != nil {
 			return nil, err
 		}
 
 		records, _ := result.Collect(ctx)
 		for _, r := range records {
-			bands = append(bands, &Band{
+			bands = append(bands, &entities.Band{
 				Name: r.Values[0].(string),
-				Musician: &Musician{
+				Musician: &entities.Musician{
 					Name: r.Values[1].(string),
-					Instrument: &Instrument{
+					Instrument: &entities.Instrument{
 						Name: r.Values[2].(string),
 					},
 				},
@@ -99,24 +78,24 @@ func FindBands(driver neo4j.DriverWithContext, ctx context.Context) ([]*Band, er
 		return nil, err
 	}
 
-	return bands.([]*Band), nil
+	return bands.([]*entities.Band), nil
 }
 
-func FindMusicians(driver neo4j.DriverWithContext, ctx context.Context) ([]*Musician, error) {
+func FindMusicians(driver neo4j.DriverWithContext, ctx context.Context) ([]*entities.Musician, error) {
 	session := driver.NewSession(ctx, neo4j.SessionConfig{AccessMode: neo4j.AccessModeRead})
 	defer session.Close(ctx)
 	musicians, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (interface{}, error) {
-		var musicians []*Musician
-		result, err := tx.Run(ctx, "MATCH(m:Musician)-[:Play]-(i:Instrument) RETURN m.name, i.name", nil)
+		var musicians []*entities.Musician
+		result, err := tx.Run(ctx, "MATCH(m:Musician)-[:PLAYS]-(i:Instrument) RETURN m.name, i.name", nil)
 		if err != nil {
 			return nil, err
 		}
 
 		records, _ := result.Collect(ctx)
 		for _, r := range records {
-			m := &Musician{
+			m := &entities.Musician{
 				Name: r.Values[0].(string),
-				Instrument: &Instrument{
+				Instrument: &entities.Instrument{
 					Name: r.Values[1].(string),
 				},
 			}
@@ -126,5 +105,5 @@ func FindMusicians(driver neo4j.DriverWithContext, ctx context.Context) ([]*Musi
 		return musicians, nil
 	})
 
-	return musicians.([]*Musician), err
+	return musicians.([]*entities.Musician), err
 }
