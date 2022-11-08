@@ -3,12 +3,12 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/SergioVenicio/neo4jMusic/repositories"
 	"github.com/go-chi/chi"
 )
-
 
 type AlbumHandler struct {
 	Repository *repositories.AlbumRepository
@@ -40,7 +40,7 @@ func (h *AlbumHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(albums)
 }
 
-func NewAlbumHandler (repository *repositories.AlbumRepository) *AlbumHandler {
+func NewAlbumHandler(repository *repositories.AlbumRepository) *AlbumHandler {
 	return &AlbumHandler{
 		Repository: repository,
 	}

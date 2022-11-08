@@ -13,7 +13,6 @@ import (
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
-
 func main() {
 	godotenv.Load()
 
@@ -31,9 +30,9 @@ func main() {
 
 	albumRepo := repositories.NewAlbumRepository(driver)
 	albumHandler := handlers.NewAlbumHandler(albumRepo)
-	
+
 	r := chi.NewRouter()
-	r.Route("/album", func(r chi.Router)  {
+	r.Route("/album", func(r chi.Router) {
 		r.Get("/{name}", albumHandler.FindByName)
 		r.Get("/", albumHandler.FindAll)
 	})

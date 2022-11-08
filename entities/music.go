@@ -1,13 +1,13 @@
 package entities
 
 type Music struct {
-	Name string `json:"name"`
-	Order int64 `json:"order"`
+	Name  string  `json:"name"`
+	Order float64 `json:"order"`
 }
 
-func NewMusic(name string, order int64) *Music {
+func NewMusic(name string, order float64) *Music {
 	return &Music{
-		Name: name,
+		Name:  name,
 		Order: order,
 	}
 }

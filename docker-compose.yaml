@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 services:
     neo4j:
       image: neo4j
@@ -8,9 +8,24 @@ services:
         - "7474:7474"
         - "7687:7687"
       volumes:
-        - ./neo4j/data:/data
-        - ./neo4j/conf:/conf
-        - ./neo4j/plugins:/plugins
-        - ./neo4j/logs:/logs
+        - neo4jData:/data
+        - neo4jConfig:/conf
+        - neo4jPlugins:/plugins
+        - neo4jLogs:/logs
       environment:
         NEO4J_AUTH: "neo4j/root"
+    rabbitmq:
+      image: rabbitmq:3.11.2-management-alpine
+      container_name: rabbitmq
+      ports:
+          - 5672:5672
+          - 15672:15672
+      environment:
+        - RABBITMQ_DEFAULT_USER=rabbitmq
+        - RABBITMQ_DEFAULT_PASS=rabbitmq
+  
+volumes:
+  neo4jData:
+  neo4jConfig:
+  neo4jLogs:
+  neo4jPlugins:
