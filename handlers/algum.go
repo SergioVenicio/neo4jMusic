@@ -26,10 +26,10 @@ func (h *AlbumHandler) FindAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(albums)
 }
 
-
 func (h *AlbumHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	name := chi.URLParam(r, "name")
+	fmt.Println(name)
 	ctx := context.Background()
 	albums, err := h.Repository.FindByName(ctx, name)
 	if err != nil || len(albums) == 0 {
